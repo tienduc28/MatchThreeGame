@@ -13,6 +13,17 @@ public class Gem : MonoBehaviour
     private bool mousePressed;
     private float swipeAngle; // Angle of the swipe
     private Gem otherGem; // Reference to the other gem being swapped
+
+    private float swapSpeed = 10f; // Speed of the swap animation
+
+    public enum GemType { Red, Blue, Green, Yellow, Purple }
+    public GemType gemType; // Type of the gem
+
+    public bool isMatched = false; // Flag to indicate if the gem is part of a match
+    private void Awake()
+    {
+
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -20,8 +31,17 @@ public class Gem : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        if (Vector2.Distance(transform.position, posIndex) > 0.01f)
+        {
+            transform.position = Vector2.Lerp(transform.position, posIndex, swapSpeed * Time.deltaTime);
+        }
+        else
+        {
+            transform.position = new Vector3(posIndex.x, posIndex.y, 0f);
+            board.allGems[posIndex.x, posIndex.y] = this; // Update the gem's position in the board's array
+        }
         if (mousePressed && Input.GetMouseButtonUp(0))
         {
             lastTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // Get the last touch position
@@ -29,6 +49,7 @@ public class Gem : MonoBehaviour
 
             CalculateAngle(); // Calculate the swipe angle
         }
+
     }
 
     public void SetupGem(Vector2Int pos, Board theBoard)
@@ -64,14 +85,16 @@ public class Gem : MonoBehaviour
             Debug.Log("Right Swipe");
             // Move right
             otherGem = board.allGems[posIndex.x + 1, posIndex.y];
+            //Debug.Log(otherGem.posIndex.x);
             posIndex.x += 1;
             otherGem.posIndex.x -= 1;
+            //Debug.Log(otherGem.posIndex.x);
         }
         else if (swipeAngle > 45 && swipeAngle <= 135 && posIndex.y < board.height - 1) // Up swipe
         {
             Debug.Log("Up Swipe");
             // Move up
-           otherGem = board.allGems[posIndex.x, posIndex.y + 1];
+            otherGem = board.allGems[posIndex.x, posIndex.y + 1];
             posIndex.y += 1;
             otherGem.posIndex.y -= 1;
         }

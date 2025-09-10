@@ -11,6 +11,12 @@ public class Board : MonoBehaviour
 
     public Gem[] gem; // Array to hold gem prefabs, if needed
     public Gem[,] allGems; // 2D array to hold all gems on the board
+
+    private MatchFinder matchFinder;
+    private void Awake()
+    {
+        matchFinder = FindObjectOfType<MatchFinder>();
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +27,10 @@ public class Board : MonoBehaviour
     }
 
     // Update is called once per frame
+    private void Update()
+    {
+        matchFinder.FindAllMatch();
+    }   
     private void Setup()
     {
         for (int x = 0; x < width; x++)
