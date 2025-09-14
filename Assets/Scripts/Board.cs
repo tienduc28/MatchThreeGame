@@ -12,7 +12,7 @@ public class Board : MonoBehaviour
     public Gem[] gem; // Array to hold gem prefabs, if needed
     public Gem[,] allGems; // 2D array to hold all gems on the board
 
-    private MatchFinder matchFinder;
+    public MatchFinder matchFinder;
     private void Awake()
     {
         matchFinder = FindObjectOfType<MatchFinder>();
@@ -44,6 +44,16 @@ public class Board : MonoBehaviour
 
                 int gemIndex = Random.Range(0, gem.Length); // Randomly select a gem prefab from the array
 
+                int iterations = 0; // Safety counter to prevent infinite loops
+                while (MatchesAt(new Vector2Int(x, y), gem[gemIndex]) && iterations < 10)
+                {
+                    gemIndex = Random.Range(0, gem.Length); // Re-select if it creates a match
+                    iterations++;
+                    if (iterations > 0)
+                    {
+                        Debug.Log(iterations);
+                    }
+                }
                 SpawnGem(new Vector2Int(x, y), gem[gemIndex]);
             }
         }
@@ -57,5 +67,50 @@ public class Board : MonoBehaviour
 
         allGems[pos.x, pos.y] = gem; // Store the gem in the 2D array
         gem.SetupGem(pos, this); // Initialize the gem with its position and board reference
+    }
+
+    bool MatchesAt(Vector2Int posToCheck, Gem gemToCheck)
+    {
+        if (posToCheck.x > 1)
+        {
+            if (allGems[posToCheck.x - 1, posToCheck.y].gemType == gemToCheck.gemType &&
+                allGems[posToCheck.x - 2, posToCheck.y].gemType == gemToCheck.gemType)
+            {
+                return true;
+            }
+        }
+
+        if (posToCheck.y > 1)
+        {
+            if (allGems[posToCheck.x, posToCheck.y - 1].gemType == gemToCheck.gemType &&
+                allGems[posToCheck.x, posToCheck.y - 2].gemType == gemToCheck.gemType)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void DestroyMatchedGemAt(Vector2Int pos)
+    {
+        if (allGems[pos.x, pos.y] != null)
+        {
+            if (allGems[pos.x, pos.y].isMatched)
+            {
+                Destroy(allGems[pos.x, pos.y].gameObject);
+                allGems[pos.x, pos.y] = null; // Clear the reference in the array
+            }
+        }
+    }
+
+    public void DestroyAllMatches()
+    {
+        for (int i = 0; i < matchFinder.currentMatches.Count; i++)
+        {
+            if (matchFinder.currentMatches[i] != null)
+            {
+                DestroyMatchedGemAt(matchFinder.currentMatches[i].posIndex);
+            }                
+        }
     }
 }

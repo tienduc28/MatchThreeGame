@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,8 @@ public class Gem : MonoBehaviour
     public GemType gemType; // Type of the gem
 
     public bool isMatched = false; // Flag to indicate if the gem is part of a match
+
+    private Vector2Int previousPos; // Store the previous position for animation purposes
     private void Awake()
     {
 
@@ -56,8 +59,6 @@ public class Gem : MonoBehaviour
     {
         posIndex = pos;
         board = theBoard; // Set the board reference
-        //transform.position = new Vector3(pos.x, pos.y, 0f); // Set the position of the gem
-        //gameObject.name = $"Gem {pos.x}, {pos.y}"; // Name the gem for easier identification
     }
 
     private void OnMouseDown()
@@ -80,9 +81,11 @@ public class Gem : MonoBehaviour
 
     private void MovePieces()
     {
+        previousPos = posIndex; // Store the previous position before moving
+
         if (swipeAngle > -45 && swipeAngle <= 45 && posIndex.x < board.width - 1) // Right swipe
         {
-            Debug.Log("Right Swipe");
+            //Debug.Log("Right Swipe");
             // Move right
             otherGem = board.allGems[posIndex.x + 1, posIndex.y];
             //Debug.Log(otherGem.posIndex.x);
@@ -92,7 +95,7 @@ public class Gem : MonoBehaviour
         }
         else if (swipeAngle > 45 && swipeAngle <= 135 && posIndex.y < board.height - 1) // Up swipe
         {
-            Debug.Log("Up Swipe");
+            //Debug.Log("Up Swipe");
             // Move up
             otherGem = board.allGems[posIndex.x, posIndex.y + 1];
             posIndex.y += 1;
@@ -100,7 +103,7 @@ public class Gem : MonoBehaviour
         }
         else if ((swipeAngle > 135 || swipeAngle <= -135) && posIndex.x > 0) // Left swipe
         {
-            Debug.Log("Left Swipe");
+            //Debug.Log("Left Swipe");
             // Move left
             otherGem = board.allGems[posIndex.x - 1, posIndex.y];
             posIndex.x -= 1;
@@ -108,7 +111,7 @@ public class Gem : MonoBehaviour
         }
         else if (swipeAngle < -45 && swipeAngle >= -135 && posIndex.y > 0) // Down swipe
         {
-            Debug.Log("Down Swipe");
+            //Debug.Log("Down Swipe");
             // Move down
             otherGem = board.allGems[posIndex.x, posIndex.y - 1];
             posIndex.y -= 1;
@@ -118,6 +121,33 @@ public class Gem : MonoBehaviour
         {
             Debug.Log("Invalid Move");
             // Invalid move, do nothing or provide feedback
+        }
+
+        board.allGems[posIndex.x, posIndex.y] = this; // Update the gem's position in the board's array
+        board.allGems[otherGem.posIndex.x, otherGem.posIndex.y] = otherGem; // Update the other gem's position in the board's array
+
+        StartCoroutine(CheckMoveCo()); // Start the coroutine to check the move
+    }
+
+    public IEnumerator CheckMoveCo()
+    {
+        yield return new WaitForSeconds(0.5f); // Wait for the swap animation to complete
+        board.matchFinder.FindAllMatch(); // Check for matches on the board
+        if (otherGem != null)
+        {
+            if (!isMatched && !otherGem.isMatched)
+            {
+                //Debug.Log("No Match Found, Reverting Move");
+                otherGem.posIndex = posIndex; // Revert the other gem's position
+                posIndex = previousPos; // Revert this gem's position
+
+                board.allGems[posIndex.x, posIndex.y] = this; // Update the gem's position in the board's array
+                board.allGems[otherGem.posIndex.x, otherGem.posIndex.y] = otherGem; // Update the other gem's position in the board's array
+            }
+            else
+            {
+                board.DestroyAllMatches(); // Destroy all matched gems
+            }
         }
     }
 }

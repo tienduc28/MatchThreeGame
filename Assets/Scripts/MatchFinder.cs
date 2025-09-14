@@ -42,7 +42,7 @@ public class MatchFinder : MonoBehaviour
                         leftGem.gemType == currentGem.gemType &&
                         rightGem.gemType == currentGem.gemType)
                     {
-                        Debug.Log($"Horizontal match found at ({x}, {y}) with type {currentGem.gemType}");
+                        //Debug.Log($"Horizontal match found at ({x}, {y}) with type {currentGem.gemType}");
                         currentGem.isMatched = true;
                         leftGem.isMatched = true;
                         rightGem.isMatched = true;
@@ -61,7 +61,7 @@ public class MatchFinder : MonoBehaviour
                         topGem.gemType == currentGem.gemType &&
                         bottomGem.gemType == currentGem.gemType)
                     {
-                        Debug.Log($"Vertical match found at ({x}, {y}) with type {currentGem.gemType}");
+                        //Debug.Log($"Vertical match found at ({x}, {y}) with type {currentGem.gemType}");
                         currentGem.isMatched = true;
                         topGem.isMatched = true;
                         bottomGem.isMatched = true;
