@@ -161,6 +161,8 @@ MonoBehaviour:
   - {fileID: 761564963249204127, guid: 841286b515aaf8f418dcfd7e56271027, type: 3}
   - {fileID: 2794908016357049440, guid: 60ac0cbf3f25c834983c98bf98481cac, type: 3}
   - {fileID: 3086759124922586339, guid: c893d63bf64096a43bb9e2fbf771eda6, type: 3}
+  matchFinder: {fileID: 692166196}
+  currentState: 1
 --- !u!4 &170203698
 Transform:
   m_ObjectHideFlags: 0
@@ -289,6 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4681cdd5bf0fcb540a7a0e4ee9a96464, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentMatches: []
 --- !u!4 &692166197
 Transform:
   m_ObjectHideFlags: 0

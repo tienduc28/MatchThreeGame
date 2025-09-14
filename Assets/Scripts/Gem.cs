@@ -47,10 +47,13 @@ public class Gem : MonoBehaviour
         }
         if (mousePressed && Input.GetMouseButtonUp(0))
         {
-            lastTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // Get the last touch position
             mousePressed = false; // Reset the mouse pressed flag
 
-            CalculateAngle(); // Calculate the swipe angle
+            if (board.currentState == Board.BoardState.move)
+            {
+                lastTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // Get the last touch position
+                CalculateAngle(); // Calculate the swipe angle
+            }
         }
 
     }
@@ -63,9 +66,11 @@ public class Gem : MonoBehaviour
 
     private void OnMouseDown()
     {
-        firstTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // Get the initial touch position
-        //Debug.Log(firstTouchPosition);
-        mousePressed = true; // Set the mouse pressed flag to true
+        if (board.currentState == Board.BoardState.move)
+        {
+            firstTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // Get the initial touch position                                                                                    
+            mousePressed = true; // Set the mouse pressed flag to true
+        }
     }
 
     private void CalculateAngle()
@@ -131,6 +136,7 @@ public class Gem : MonoBehaviour
 
     public IEnumerator CheckMoveCo()
     {
+        board.currentState = Board.BoardState.wait; // Set the board state to wait
         yield return new WaitForSeconds(0.5f); // Wait for the swap animation to complete
         board.matchFinder.FindAllMatch(); // Check for matches on the board
         if (otherGem != null)
@@ -143,6 +149,10 @@ public class Gem : MonoBehaviour
 
                 board.allGems[posIndex.x, posIndex.y] = this; // Update the gem's position in the board's array
                 board.allGems[otherGem.posIndex.x, otherGem.posIndex.y] = otherGem; // Update the other gem's position in the board's array
+
+                yield return new WaitForSeconds(0.5f); // Wait for the revert animation to complete
+
+                board.currentState = Board.BoardState.move; // Set the board state back to move
             }
             else
             {

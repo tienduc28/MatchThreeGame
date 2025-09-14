@@ -13,6 +13,10 @@ public class Board : MonoBehaviour
     public Gem[,] allGems; // 2D array to hold all gems on the board
 
     public MatchFinder matchFinder;
+
+    public enum BoardState { wait, move }
+
+    public BoardState currentState = BoardState.move;
     private void Awake()
     {
         matchFinder = FindObjectOfType<MatchFinder>();
@@ -29,7 +33,7 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        matchFinder.FindAllMatch();
+        //matchFinder.FindAllMatch();
     }   
     private void Setup()
     {
@@ -45,23 +49,19 @@ public class Board : MonoBehaviour
                 int gemIndex = Random.Range(0, gem.Length); // Randomly select a gem prefab from the array
 
                 int iterations = 0; // Safety counter to prevent infinite loops
-                while (MatchesAt(new Vector2Int(x, y), gem[gemIndex]) && iterations < 10)
+                while (MatchesAt(new Vector2Int(x, y), gem[gemIndex]) && iterations < 50)
                 {
                     gemIndex = Random.Range(0, gem.Length); // Re-select if it creates a match
                     iterations++;
-                    if (iterations > 0)
-                    {
-                        Debug.Log(iterations);
-                    }
                 }
                 SpawnGem(new Vector2Int(x, y), gem[gemIndex]);
             }
         }
     }
 
-    private void SpawnGem(Vector2Int pos, Gem gemPrefab)
+    private void SpawnGem(Vector2Int pos, Gem gemPrefab) 
     {
-        Gem gem = Instantiate(gemPrefab, new Vector3(pos.x, pos.y, 0f), Quaternion.identity);
+        Gem gem = Instantiate(gemPrefab, new Vector3(pos.x, pos.y + height - 4, 0f), Quaternion.identity);
         gem.transform.SetParent(transform); // Set the parent to the board
         gem.name = $"Gem {pos.x}, {pos.y}"; // Name the gem for easier identification
 
@@ -71,6 +71,7 @@ public class Board : MonoBehaviour
 
     bool MatchesAt(Vector2Int posToCheck, Gem gemToCheck)
     {
+        if (gemToCheck == null || allGems == null) return false;
         if (posToCheck.x > 1)
         {
             if (allGems[posToCheck.x - 1, posToCheck.y].gemType == gemToCheck.gemType &&
@@ -90,6 +91,8 @@ public class Board : MonoBehaviour
         }
         return false;
     }
+
+    #region matches
 
     private void DestroyMatchedGemAt(Vector2Int pos)
     {
@@ -112,5 +115,106 @@ public class Board : MonoBehaviour
                 DestroyMatchedGemAt(matchFinder.currentMatches[i].posIndex);
             }                
         }
+
+        StartCoroutine(DecreaseRowCo());          
     }
+
+    #endregion
+
+    #region refill board and destroying
+
+    private IEnumerator DecreaseRowCo()
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        int nullCount = 0;
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (allGems[x, y] == null)
+                {
+                    nullCount++;
+                }
+                else if (nullCount > 0)
+                {
+                    allGems[x, y].posIndex.y -= nullCount;
+                    allGems[x, y - nullCount] = allGems[x, y];
+                    allGems[x, y] = null;
+                }
+            }
+            nullCount = 0; 
+        }
+
+        StartCoroutine(FillBoardCo());
+    }
+
+    private IEnumerator FillBoardCo()
+    {
+        yield return new WaitForSeconds(0.5f);
+        RefillBoard();
+
+        yield return new WaitForSeconds(0.5f);
+
+        matchFinder.FindAllMatch();
+        if (matchFinder.currentMatches.Count > 0)
+        {
+            yield return new WaitForSeconds(0.5f);
+            DestroyAllMatches();
+        }
+        else
+        {
+            currentState = BoardState.move;
+        }
+
+
+    }
+
+    private void RefillBoard()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (allGems[x, y] == null)
+                {
+                    int gemIndex = Random.Range(0, gem.Length); // Randomly select a gem prefab from the array
+                    int iterations = 0; // Safety counter to prevent infinite loops
+                    while (MatchesAt(new Vector2Int(x, y), gem[gemIndex]) && iterations < 10)
+                    {
+                        gemIndex = Random.Range(0, gem.Length); // Re-select if it creates a match
+                        iterations++;                
+                    }
+                    SpawnGem(new Vector2Int(x, y), gem[gemIndex]);
+                }
+            }
+        }
+
+        CheckForMisplaceGems();
+    }
+
+    private void CheckForMisplaceGems()
+    {
+        List<Gem> foundGems = new List<Gem>();
+
+        foundGems.AddRange(FindObjectsOfType<Gem>());
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (foundGems.Contains(allGems[x, y]))
+                {
+                    foundGems.Remove(allGems[x, y]);
+                }
+            }
+        }
+
+        foreach (Gem g in foundGems)
+        {
+            Destroy(g.gameObject);
+        }
+    }
+
+    #endregion
 }
