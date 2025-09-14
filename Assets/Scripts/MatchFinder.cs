@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MatchFinder : MonoBehaviour
 {
     private Board board;
+    public List<Gem> currentMatches = new List<Gem>();
     private void Awake()
     {
         board = FindObjectOfType<Board>();
@@ -23,6 +26,7 @@ public class MatchFinder : MonoBehaviour
 
     public void FindAllMatch()
     {
+        currentMatches.Clear(); // Clear previous matches
         for (int x = 0; x < board.width; x++)
         {
             for (int y = 0; y < board.height; y++)
@@ -42,6 +46,10 @@ public class MatchFinder : MonoBehaviour
                         currentGem.isMatched = true;
                         leftGem.isMatched = true;
                         rightGem.isMatched = true;
+
+                        currentMatches.Add(currentGem);
+                        currentMatches.Add(leftGem);
+                        currentMatches.Add(rightGem);
                     }
                 }
                 // Check vertical match
@@ -57,9 +65,23 @@ public class MatchFinder : MonoBehaviour
                         currentGem.isMatched = true;
                         topGem.isMatched = true;
                         bottomGem.isMatched = true;
+
+                        currentMatches.Add(currentGem);
+                        currentMatches.Add(topGem);
+                        currentMatches.Add(bottomGem);
                     }
                 }
             }
+        }
+
+        if (currentMatches.Count > 0)
+        {
+            //foreach (Gem gem in currentMatches)
+            //{
+            //    Debug.Log($"Matched Gem at ({gem.posIndex.x}, {gem.posIndex.y}) of type {gem.gemType}");
+            //}
+
+            currentMatches = currentMatches.Distinct().ToList();
         }
     }
 }
