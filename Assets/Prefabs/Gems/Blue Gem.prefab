@@ -101,6 +101,8 @@ MonoBehaviour:
   posIndex: {x: 0, y: 0}
   board: {fileID: 0}
   gemType: 1
+  isMatched: 0
+  destroyEffect: {fileID: 6421397208037491281, guid: f49c67effe6ae63489d8463831e29490, type: 3}
 --- !u!61 &8135971028247098182
 BoxCollider2D:
   m_ObjectHideFlags: 0

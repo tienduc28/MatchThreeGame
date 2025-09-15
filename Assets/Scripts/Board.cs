@@ -17,9 +17,16 @@ public class Board : MonoBehaviour
     public enum BoardState { wait, move }
 
     public BoardState currentState = BoardState.move;
+
+    public RoundManager roundManager;
+
+    private float bonusMultiplier;
+    public float bonusAmount = 0.5f;
+
     private void Awake()
     {
         matchFinder = FindObjectOfType<MatchFinder>();
+        roundManager = FindObjectOfType<RoundManager>();
     }
     // Start is called before the first frame update
     void Start()
@@ -33,7 +40,10 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        //matchFinder.FindAllMatch();
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            ShuffleBoard();
+        }
     }   
     private void Setup()
     {
@@ -100,6 +110,8 @@ public class Board : MonoBehaviour
         {
             if (allGems[pos.x, pos.y].isMatched)
             {
+                Instantiate(allGems[pos.x, pos.y].destroyEffect, new Vector2(pos.x, pos.y), Quaternion.identity);
+
                 Destroy(allGems[pos.x, pos.y].gameObject);
                 allGems[pos.x, pos.y] = null; // Clear the reference in the array
             }
@@ -112,6 +124,8 @@ public class Board : MonoBehaviour
         {
             if (matchFinder.currentMatches[i] != null)
             {
+                ScoreCheck(matchFinder.currentMatches[i]);
+
                 DestroyMatchedGemAt(matchFinder.currentMatches[i].posIndex);
             }                
         }
@@ -160,12 +174,16 @@ public class Board : MonoBehaviour
         matchFinder.FindAllMatch();
         if (matchFinder.currentMatches.Count > 0)
         {
+            bonusMultiplier++;
+
             yield return new WaitForSeconds(0.5f);
             DestroyAllMatches();
         }
         else
         {
+            yield return new WaitForSeconds(0.5f);
             currentState = BoardState.move;
+            bonusMultiplier = 0;
         }
 
 
@@ -217,4 +235,53 @@ public class Board : MonoBehaviour
     }
 
     #endregion
+
+    private void ShuffleBoard()
+    {
+        if (currentState != BoardState.wait)
+        {
+            currentState = BoardState.wait;
+
+            List<Gem> gems = new List<Gem>();
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    gems.Add(allGems[x, y]);
+                    allGems[x, y] = null;
+                }
+            }
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    int gemIndex = Random.Range(0, gems.Count);
+                    int iterations = 0; // Safety counter to prevent infinite loops
+                    while (MatchesAt(new Vector2Int(x, y), gems[gemIndex]) && iterations < 50)
+                    {
+                        gemIndex = Random.Range(0, gems.Count); // Re-select if it creates a match
+                        iterations++;
+                    }
+                    gems[gemIndex].posIndex = new Vector2Int(x, y);
+                    allGems[x, y] = gems[gemIndex];
+                    gems.RemoveAt(gemIndex);
+                }
+            }
+        }
+
+        StartCoroutine(FillBoardCo());
+    }
+
+    public void ScoreCheck(Gem gemToCheck)
+    {
+        roundManager.currentScore += gemToCheck.scoreValue;
+
+        if (bonusMultiplier > 0)
+        {
+            float bonusToAdd = gemToCheck.scoreValue * bonusAmount * bonusMultiplier;
+            roundManager.currentScore += Mathf.RoundToInt(bonusToAdd);
+        }
+    }
 }

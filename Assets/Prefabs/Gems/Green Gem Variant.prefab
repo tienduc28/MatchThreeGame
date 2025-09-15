@@ -11,6 +11,10 @@ PrefabInstance:
       propertyPath: gemType
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: -7110327493663254536, guid: 5bcaa3fc8fb5fe241bd03cc5d1880b77, type: 3}
+      propertyPath: destroyEffect
+      value: 
+      objectReference: {fileID: 6383520416301237244, guid: 695fa59f0f24d7a4a8f18b5d207fbb6e, type: 3}
     - target: {fileID: 4514528758566618541, guid: 5bcaa3fc8fb5fe241bd03cc5d1880b77, type: 3}
       propertyPath: m_Name
       value: Green Gem Variant

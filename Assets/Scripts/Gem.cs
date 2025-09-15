@@ -23,6 +23,11 @@ public class Gem : MonoBehaviour
     public bool isMatched = false; // Flag to indicate if the gem is part of a match
 
     private Vector2Int previousPos; // Store the previous position for animation purposes
+
+    public GameObject destroyEffect; // Particle effect prefab for gem destruction
+
+    public int scoreValue = 10; // Score value for destroying this gem
+
     private void Awake()
     {
 
@@ -49,7 +54,7 @@ public class Gem : MonoBehaviour
         {
             mousePressed = false; // Reset the mouse pressed flag
 
-            if (board.currentState == Board.BoardState.move)
+            if (board.currentState == Board.BoardState.move && board.roundManager.roundTime > 0)
             {
                 lastTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // Get the last touch position
                 CalculateAngle(); // Calculate the swipe angle
@@ -66,7 +71,7 @@ public class Gem : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (board.currentState == Board.BoardState.move)
+        if (board.currentState == Board.BoardState.move && board.roundManager.roundTime > 0)
         {
             firstTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // Get the initial touch position                                                                                    
             mousePressed = true; // Set the mouse pressed flag to true
