@@ -25,8 +25,8 @@ public class Board : MonoBehaviour
 
     private void Awake()
     {
-        matchFinder = FindObjectOfType<MatchFinder>();
-        roundManager = FindObjectOfType<RoundManager>();
+        matchFinder = FindAnyObjectByType<MatchFinder>();
+        roundManager = FindAnyObjectByType<RoundManager>();
     }
     // Start is called before the first frame update
     void Start()
@@ -44,7 +44,7 @@ public class Board : MonoBehaviour
         {
             ShuffleBoard();
         }
-    }   
+    }
     private void Setup()
     {
         for (int x = 0; x < width; x++)
@@ -69,7 +69,20 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void SpawnGem(Vector2Int pos, Gem gemPrefab) 
+    //void HandleFrame()
+    //{
+    //    while (true)
+    //    {
+    //        Board.Destroy();
+    //        Board.Fall();
+    //        Board.Check()
+    //        Board.Gen()
+    //            yield return null;
+    //    }
+
+    //}
+
+    private void SpawnGem(Vector2Int pos, Gem gemPrefab)
     {
         Gem gem = Instantiate(gemPrefab, new Vector3(pos.x, pos.y + height - 4, 0f), Quaternion.identity);
         gem.transform.SetParent(transform); // Set the parent to the board
@@ -127,10 +140,10 @@ public class Board : MonoBehaviour
                 ScoreCheck(matchFinder.currentMatches[i]);
 
                 DestroyMatchedGemAt(matchFinder.currentMatches[i].posIndex);
-            }                
+            }
         }
 
-        StartCoroutine(DecreaseRowCo());          
+        StartCoroutine(DecreaseRowCo());
     }
 
     #endregion
@@ -158,7 +171,7 @@ public class Board : MonoBehaviour
                     allGems[x, y] = null;
                 }
             }
-            nullCount = 0; 
+            nullCount = 0;
         }
 
         StartCoroutine(FillBoardCo());
@@ -202,7 +215,7 @@ public class Board : MonoBehaviour
                     while (MatchesAt(new Vector2Int(x, y), gem[gemIndex]) && iterations < 10)
                     {
                         gemIndex = Random.Range(0, gem.Length); // Re-select if it creates a match
-                        iterations++;                
+                        iterations++;
                     }
                     SpawnGem(new Vector2Int(x, y), gem[gemIndex]);
                 }
@@ -214,9 +227,9 @@ public class Board : MonoBehaviour
 
     private void CheckForMisplaceGems()
     {
-        List<Gem> foundGems = new List<Gem>();
+        List<Gem> foundGems = new();
 
-        foundGems.AddRange(FindObjectsOfType<Gem>());
+        foundGems.AddRange(FindObjectsByType<Gem>(FindObjectsSortMode.None));
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -242,7 +255,7 @@ public class Board : MonoBehaviour
         {
             currentState = BoardState.wait;
 
-            List<Gem> gems = new List<Gem>();
+            List<Gem> gems = new();
 
             for (int x = 0; x < width; x++)
             {

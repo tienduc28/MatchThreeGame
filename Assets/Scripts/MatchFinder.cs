@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class MatchFinder : MonoBehaviour
@@ -10,12 +9,12 @@ public class MatchFinder : MonoBehaviour
     public List<Gem> currentMatches = new List<Gem>();
     private void Awake()
     {
-        board = FindObjectOfType<Board>();
+        board = FindAnyObjectByType<Board>();
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame

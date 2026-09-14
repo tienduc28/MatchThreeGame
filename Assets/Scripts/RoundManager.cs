@@ -18,13 +18,13 @@ public class RoundManager : MonoBehaviour
     public float scoreSpeed = 5f;
     void Awake()
     {
-        uiManager = FindObjectOfType<UIManager>();
-        board = FindObjectOfType<Board>();
+        uiManager = FindAnyObjectByType<UIManager>();
+        board = FindAnyObjectByType<Board>();
     }
     // Start is called before the first frame update
     void Start()
     {
-        uiManager = FindObjectOfType<UIManager>();
+        uiManager = FindAnyObjectByType<UIManager>();
     }
 
     // Update is called once per frame
