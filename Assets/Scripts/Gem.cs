@@ -17,16 +17,13 @@ public class Gem : MonoBehaviour
 
     private float swapSpeed = 10f; // Speed of the swap animation
 
-    public enum GemType { Red, Blue, Green, Yellow, Purple }
+    public enum GemType { Red, Blue, Green, Yellow, Purple, Bomb }
     public GemType gemType; // Type of the gem
-
     public bool isMatched = false; // Flag to indicate if the gem is part of a match
-
     private Vector2Int previousPos; // Store the previous position for animation purposes
-
     public GameObject destroyEffect; // Particle effect prefab for gem destruction
-
     public int scoreValue = 10; // Score value for destroying this gem
+    public int blastSize = 1;
 
     private void Awake()
     {
@@ -35,7 +32,7 @@ public class Gem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame

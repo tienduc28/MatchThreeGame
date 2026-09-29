@@ -23,6 +23,9 @@ public class Board : MonoBehaviour
     private float bonusMultiplier;
     public float bonusAmount = 0.5f;
 
+    public Gem bomb;
+    public float bombChance = 2f;
+
     private void Awake()
     {
         matchFinder = FindAnyObjectByType<MatchFinder>();
@@ -84,6 +87,10 @@ public class Board : MonoBehaviour
 
     private void SpawnGem(Vector2Int pos, Gem gemPrefab)
     {
+        if (Random.Range(0, 100) < bombChance)
+        {
+            gemPrefab = bomb;
+        }
         Gem gem = Instantiate(gemPrefab, new Vector3(pos.x, pos.y + height - 4, 0f), Quaternion.identity);
         gem.transform.SetParent(transform); // Set the parent to the board
         gem.name = $"Gem {pos.x}, {pos.y}"; // Name the gem for easier identification
@@ -123,7 +130,7 @@ public class Board : MonoBehaviour
         {
             if (allGems[pos.x, pos.y].isMatched)
             {
-                Instantiate(allGems[pos.x, pos.y].destroyEffect, new Vector2(pos.x, pos.y), Quaternion.identity);
+                Instantiate(allGems[pos.x, pos.y].destroyEffect, new Vector3(pos.x, pos.y, -1), Quaternion.identity);
 
                 Destroy(allGems[pos.x, pos.y].gameObject);
                 allGems[pos.x, pos.y] = null; // Clear the reference in the array
