@@ -12,10 +12,12 @@ public class RoundManager : MonoBehaviour
     private Board board;
 
     public int currentScore = 0;
-
     public float displayScore = 0;
-
     public float scoreSpeed = 5f;
+
+    public int scoreTarget1;
+    public int scoreTarget2;
+    public int scoreTarget3;
     void Awake()
     {
         uiManager = FindAnyObjectByType<UIManager>();
@@ -56,5 +58,27 @@ public class RoundManager : MonoBehaviour
     private void WinCheck()
     {
         uiManager.roundOverScreen.SetActive(true);
+
+        uiManager.winScore.text = currentScore.ToString();
+
+        if (currentScore >= scoreTarget3)
+        {
+            uiManager.winStars3.SetActive(true);
+            uiManager.winText.text = "Amazing! You earn 3 stars";
+        }
+        else if (currentScore >= scoreTarget2)
+        {
+            uiManager.winStars2.SetActive(true);
+            uiManager.winText.text = "Great job! You earn 2 stars";
+        }
+        else if (currentScore >= scoreTarget1)
+        {
+            uiManager.winStars1.SetActive(true);
+            uiManager.winText.text = "Good job! You earn 1 star";
+        }
+        else
+        {
+            uiManager.winText.text = "You failed!";
+        }
     }
 }
