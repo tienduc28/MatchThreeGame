@@ -876,7 +876,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roundTime: 2
-  currentScore: 0
+  currentScore: 300
   displayScore: 0
   scoreSpeed: 5
   scoreTarget1: 100

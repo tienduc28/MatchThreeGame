@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.termway.ide.antigravity": "https://github.com/TermWay/unity-ide-antigravity.git",
     "com.unity.ai.navigation": "2.0.14",
     "com.unity.collab-proxy": "2.9.3",
     "com.unity.feature.2d": "2.0.1",

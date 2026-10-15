@@ -874,8 +874,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be79653d02360f443a806472dd5736a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roundTime: 60
-  currentScore: 0
+  roundTime: 5
+  currentScore: 1000
   displayScore: 0
   scoreSpeed: 5
   scoreTarget1: 100
